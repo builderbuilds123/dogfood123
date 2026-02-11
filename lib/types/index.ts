@@ -7,6 +7,7 @@ export type Referral = Database['public']['Tables']['referrals']['Row']
 
 export type Persona = 'doggo' | 'princess'
 export type MessageType = 'text' | 'image' | 'audio'
+export type MessageStatus = 'sent' | 'delivered' | 'read'
 
 export interface MessageWithSender extends Message {
   sender: Pick<Profile, 'id' | 'display_name' | 'persona' | 'avatar_url'>

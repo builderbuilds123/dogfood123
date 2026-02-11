@@ -128,7 +128,7 @@ export function ReplayView({ messages, userId }: ReplayViewProps) {
               </div>
             </MessageIntoBlackhole>
           ) : (
-            <MessageFromBlackhole onComplete={handleAnimationComplete}>
+            <MessageFromBlackhole angle={Math.random() * Math.PI * 2} phase="entering" onEnterComplete={handleAnimationComplete}>
               <div className="bg-surface-light px-3 py-1.5 rounded-xl text-xs text-white max-w-[150px] truncate border border-border">
                 {animatingMessage.message_type === 'text' ? animatingMessage.content : `[${animatingMessage.message_type}]`}
               </div>

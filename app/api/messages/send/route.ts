@@ -16,17 +16,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  // Validate the user is part of this link
-  const { data: link } = await supabase
-    .from('user_links')
-    .select('id, user_a, user_b')
-    .eq('id', linkId)
-    .single()
-
-  if (!link || (link.user_a !== user.id && link.user_b !== user.id)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
-  }
-
+  // RLS policy enforces that sender_id = auth.uid() and link belongs to user
   const { data: message, error } = await supabase
     .from('messages')
     .insert({

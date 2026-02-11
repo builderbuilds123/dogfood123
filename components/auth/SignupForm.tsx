@@ -25,23 +25,44 @@ export function SignupForm() {
     const ref = searchParams.get('ref')
     if (ref) {
       setReferralCode(ref)
-      // Look up the referrer's persona to auto-assign the opposite
-      async function lookupReferrer() {
-        const { data } = await supabase
-          .from('profiles')
-          .select('persona')
-          .eq('referral_code', ref)
-          .single()
 
-        if (data?.persona) {
-          const opposite: Persona = data.persona === 'doggo' ? 'princess' : 'doggo'
+      async function handleRef() {
+        // Check if user is already logged in
+        const { data: { user: currentUser } } = await supabase.auth.getUser()
+
+        if (currentUser) {
+          // Already logged in — just accept the referral and redirect
+          setLoading(true)
+          const { data: rpcResult, error: rpcError } = await supabase.rpc('accept_referral', {
+            ref_code: ref,
+            accepter_id: currentUser.id,
+          })
+
+          if (rpcError) {
+            toast('Referral linking failed: ' + rpcError.message, 'error')
+            setLoading(false)
+          } else if (rpcResult?.error) {
+            toast(rpcResult.error, 'error')
+            setLoading(false)
+          } else {
+            toast('Connected with your partner!', 'success')
+            router.push('/blackhole')
+            router.refresh()
+          }
+          return
+        }
+
+        // Not logged in — look up referrer's persona to auto-assign the opposite
+        const { data } = await supabase.rpc('get_referrer_persona', { ref_code: ref })
+        if (data) {
+          const opposite: Persona = data === 'doggo' ? 'princess' : 'doggo'
           setLockedPersona(opposite)
           setPersona(opposite)
         }
       }
-      lookupReferrer()
+      handleRef()
     }
-  }, [searchParams, supabase])
+  }, [searchParams, supabase, router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -74,17 +95,19 @@ export function SignupForm() {
         .update({ persona, display_name: displayName || email.split('@')[0] })
         .eq('id', data.user.id)
 
-      // If there's a referral code, accept it
+      // If there's a referral code, accept it and link the users via RPC
       if (referralCode) {
-        try {
-          await fetch('/api/referral/accept', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ referralCode }),
-          })
-        } catch {
-          // Non-blocking — link may fail but signup succeeded
-          console.error('Failed to accept referral')
+        const { data: rpcResult, error: rpcError } = await supabase.rpc('accept_referral', {
+          ref_code: referralCode,
+          accepter_id: data.user.id,
+        })
+
+        if (rpcError) {
+          console.error('Referral accept RPC error:', rpcError)
+          toast('Referral linking failed: ' + rpcError.message, 'error')
+        } else if (rpcResult?.error) {
+          console.error('Referral accept failed:', rpcResult.error)
+          toast('Referral linking failed: ' + rpcResult.error, 'error')
         }
       }
     }

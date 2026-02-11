@@ -16,7 +16,6 @@ export function Navbar({ user, profile }: NavbarProps) {
 
   const links = [
     { href: '/blackhole', label: 'Blackhole' },
-    { href: '/replay', label: 'Replay' },
     { href: '/settings', label: 'Settings' },
   ]
 

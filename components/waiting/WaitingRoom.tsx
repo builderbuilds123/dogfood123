@@ -17,11 +17,12 @@ interface WaitingRoomProps {
 export function WaitingRoom({ userId, referralCode }: WaitingRoomProps) {
   const [copied, setCopied] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
-  const referralUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/signup?ref=${referralCode}`
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  const referralUrl = `${appUrl}/signup?ref=${referralCode}`
 
   useEffect(() => {
+    const supabase = createClient()
     // Listen for a new link being created
     const channel = supabase
       .channel('waiting-for-link')
@@ -41,12 +42,14 @@ export function WaitingRoom({ userId, referralCode }: WaitingRoomProps) {
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('[Realtime] waiting room subscription:', status)
+      })
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [userId, supabase, router])
+  }, [userId, router])
 
   async function handleCopy() {
     try {

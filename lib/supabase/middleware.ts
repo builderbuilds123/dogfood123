@@ -38,6 +38,7 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/signup') &&
     !request.nextUrl.pathname.startsWith('/auth') &&
+    !request.nextUrl.pathname.startsWith('/select-persona') &&
     request.nextUrl.pathname !== '/'
   ) {
     const url = request.nextUrl.clone()
@@ -49,8 +50,26 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/signup')
   )) {
+    // If visiting a referral signup link while logged in, allow the page to load
+    // so the SignupForm can handle the referral acceptance for the logged-in user
+    const hasRefCode = request.nextUrl.searchParams.has('ref')
+    if (hasRefCode && request.nextUrl.pathname.startsWith('/signup')) {
+      return supabaseResponse
+    }
+
+    // Otherwise redirect logged-in users away from auth pages
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('persona')
+      .eq('id', user.id)
+      .single()
+
     const url = request.nextUrl.clone()
-    url.pathname = '/blackhole'
+    if (!profile?.persona) {
+      url.pathname = '/select-persona'
+    } else {
+      url.pathname = '/blackhole'
+    }
     return NextResponse.redirect(url)
   }
 

@@ -100,7 +100,7 @@ export interface Database {
           content: string | null
           media_url: string | null
           media_metadata: Json
-          is_read: boolean
+          status: 'sent' | 'delivered' | 'read'
           created_at: string
           updated_at: string
         }
@@ -113,7 +113,7 @@ export interface Database {
           content?: string | null
           media_url?: string | null
           media_metadata?: Json
-          is_read?: boolean
+          status?: 'sent' | 'delivered' | 'read'
           created_at?: string
           updated_at?: string
         }
@@ -126,7 +126,7 @@ export interface Database {
           content?: string | null
           media_url?: string | null
           media_metadata?: Json
-          is_read?: boolean
+          status?: 'sent' | 'delivered' | 'read'
           created_at?: string
           updated_at?: string
         }

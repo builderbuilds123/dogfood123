@@ -14,7 +14,7 @@ export default async function BlackholePage() {
     .eq('id', user.id)
     .single()
 
-  if (!profile || !profile.persona) redirect('/signup')
+  if (!profile || !profile.persona) redirect('/select-persona')
 
   // Find linked partner
   const { data: link } = await supabase
@@ -34,11 +34,30 @@ export default async function BlackholePage() {
 
   if (!partner) redirect('/waiting')
 
+  // Fetch all messages for this link
+  const { data: allMessages } = await supabase
+    .from('messages')
+    .select('*')
+    .eq('link_id', link.id)
+    .order('created_at', { ascending: true })
+
+  const all = allMessages || []
+
+  // Split: messages already seen are history; undelivered messages for this user animate on load
+  const history = all.filter(
+    m => m.status !== 'sent' || m.sender_id === user.id
+  )
+  const pendingDelivery = all.filter(
+    m => m.status === 'sent' && m.receiver_id === user.id
+  )
+
   return (
     <BlackholeScene
       userId={user.id}
       partner={partner}
       link={link}
+      initialMessages={history}
+      pendingDeliveryMessages={pendingDelivery}
     />
   )
 }
