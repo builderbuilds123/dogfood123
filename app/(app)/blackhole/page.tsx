@@ -68,7 +68,6 @@ export default async function BlackholePage() {
     if (latestMoods.size >= 2) break
   }
 
-  const myMood = latestMoods.get(user.id) ?? null
   const partnerMood = latestMoods.get(partnerId) ?? null
 
   return (
@@ -78,7 +77,6 @@ export default async function BlackholePage() {
       link={link}
       initialMessages={history}
       pendingDeliveryMessages={pendingDelivery}
-      initialMyMood={myMood}
       initialPartnerMood={partnerMood}
     />
   )

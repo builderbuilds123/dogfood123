@@ -7,8 +7,6 @@ import type { MoodCheckin } from '@/lib/types'
 
 interface MoodOrbProps {
   linkId: string
-  userId: string
-  myMood: MoodCheckin | null
   partnerMood: MoodCheckin | null
   onMoodSubmitted: (checkin: MoodCheckin) => void
 }
@@ -24,7 +22,7 @@ function timeAgo(dateStr: string): string {
   return `${days}d ago`
 }
 
-export function MoodOrb({ linkId, userId, myMood, partnerMood, onMoodSubmitted }: MoodOrbProps) {
+export function MoodOrb({ linkId, partnerMood, onMoodSubmitted }: MoodOrbProps) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [popKey, setPopKey] = useState(0) // triggers pop animation
@@ -52,8 +50,6 @@ export function MoodOrb({ linkId, userId, myMood, partnerMood, onMoodSubmitted }
     setPopKey(prev => prev + 1)
   }, [])
 
-  const hasAnyMood = myMood || partnerMood
-
   return (
     <>
       <AnimatePresence mode="wait">
@@ -75,22 +71,12 @@ export function MoodOrb({ linkId, userId, myMood, partnerMood, onMoodSubmitted }
           }}
           whileTap={{ scale: 0.95 }}
         >
-          {hasAnyMood ? (
+          {partnerMood ? (
             <>
-              {partnerMood && (
-                <span className="text-base leading-none">{partnerMood.emoji}</span>
-              )}
-              {partnerMood && myMood && (
-                <span className="text-foreground/20 text-[10px]">·</span>
-              )}
-              {myMood && (
-                <span className="text-sm leading-none opacity-60">{myMood.emoji}</span>
-              )}
-              {partnerMood && (
-                <span className="text-[10px] text-foreground/30 leading-none">
-                  {timeAgo(partnerMood.created_at)}
-                </span>
-              )}
+              <span className="text-base leading-none">{partnerMood.emoji}</span>
+              <span className="text-[10px] text-foreground/30 leading-none">
+                {timeAgo(partnerMood.created_at)}
+              </span>
             </>
           ) : (
             <>

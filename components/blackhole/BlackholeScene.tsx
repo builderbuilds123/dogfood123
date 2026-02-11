@@ -23,7 +23,6 @@ interface BlackholeSceneProps {
   link: UserLink
   initialMessages: Message[]
   pendingDeliveryMessages?: Message[]
-  initialMyMood?: MoodCheckin | null
   initialPartnerMood?: MoodCheckin | null
 }
 
@@ -45,7 +44,6 @@ export function BlackholeScene({
   link,
   initialMessages,
   pendingDeliveryMessages = [],
-  initialMyMood = null,
   initialPartnerMood = null,
 }: BlackholeSceneProps) {
   const { messages, addMessage, updateMessage } = useMessages(link.id, initialMessages)
@@ -55,7 +53,6 @@ export function BlackholeScene({
   const staggerTimers = useRef<ReturnType<typeof setTimeout>[]>([])
   const [replayMode, setReplayMode] = useState(false)
   const [replayMessage, setReplayMessage] = useState<Message | null>(null)
-  const [myMood, setMyMood] = useState<MoodCheckin | null>(initialMyMood)
   const [partnerMood, setPartnerMood] = useState<MoodCheckin | null>(initialPartnerMood)
 
   // --- Staggered offline message delivery ---
@@ -145,16 +142,13 @@ export function BlackholeScene({
   }, [updateMessage])
 
   const handleMoodCheckin = useCallback((checkin: MoodCheckin) => {
-    if (checkin.user_id === userId) {
-      setMyMood(checkin)
-    } else {
+    if (checkin.user_id !== userId) {
       setPartnerMood(checkin)
     }
   }, [userId])
 
-  const handleMoodSubmitted = useCallback((checkin: MoodCheckin) => {
-    setMyMood(checkin)
-  }, [])
+  // Called after the user submits their own mood (no-op since we only show partner's)
+  const handleMoodSubmitted = useCallback((_checkin: MoodCheckin) => {}, [])
 
   useRealtime(link.id, userId, handleNewRealtimeMessage, handleMessageUpdated, handleMoodCheckin)
 
@@ -209,8 +203,6 @@ export function BlackholeScene({
             </p>
             <MoodOrb
               linkId={link.id}
-              userId={userId}
-              myMood={myMood}
               partnerMood={partnerMood}
               onMoodSubmitted={handleMoodSubmitted}
             />
