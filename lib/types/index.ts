@@ -4,6 +4,7 @@ export type Profile = Database['public']['Tables']['profiles']['Row']
 export type UserLink = Database['public']['Tables']['user_links']['Row']
 export type Message = Database['public']['Tables']['messages']['Row']
 export type Referral = Database['public']['Tables']['referrals']['Row']
+export type MoodCheckin = Database['public']['Tables']['mood_checkins']['Row']
 
 export type Persona = 'doggo' | 'princess'
 export type MessageType = 'text' | 'image' | 'audio'

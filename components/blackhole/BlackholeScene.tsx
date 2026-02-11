@@ -11,7 +11,8 @@ import { ChatInterface } from '@/components/chat/ChatInterface'
 import { ReplayTimeline } from '@/components/replay/ReplayTimeline'
 import { useMessages } from '@/lib/hooks/useMessages'
 import { useRealtime } from '@/lib/hooks/useRealtime'
-import type { Message, Profile, UserLink } from '@/lib/types'
+import { MoodOrb } from '@/components/mood/MoodOrb'
+import type { Message, MoodCheckin, Profile, UserLink } from '@/lib/types'
 
 const HOVER_DURATION = 15_000
 const STAGGER_DELAY = 800
@@ -22,6 +23,8 @@ interface BlackholeSceneProps {
   link: UserLink
   initialMessages: Message[]
   pendingDeliveryMessages?: Message[]
+  initialMyMood?: MoodCheckin | null
+  initialPartnerMood?: MoodCheckin | null
 }
 
 interface AnimatingMessage {
@@ -42,6 +45,8 @@ export function BlackholeScene({
   link,
   initialMessages,
   pendingDeliveryMessages = [],
+  initialMyMood = null,
+  initialPartnerMood = null,
 }: BlackholeSceneProps) {
   const { messages, addMessage, updateMessage } = useMessages(link.id, initialMessages)
   const [animatingMessages, setAnimatingMessages] = useState<AnimatingMessage[]>([])
@@ -50,6 +55,8 @@ export function BlackholeScene({
   const staggerTimers = useRef<ReturnType<typeof setTimeout>[]>([])
   const [replayMode, setReplayMode] = useState(false)
   const [replayMessage, setReplayMessage] = useState<Message | null>(null)
+  const [myMood, setMyMood] = useState<MoodCheckin | null>(initialMyMood)
+  const [partnerMood, setPartnerMood] = useState<MoodCheckin | null>(initialPartnerMood)
 
   // --- Staggered offline message delivery ---
   useEffect(() => {
@@ -137,7 +144,19 @@ export function BlackholeScene({
     updateMessage(updated)
   }, [updateMessage])
 
-  useRealtime(link.id, userId, handleNewRealtimeMessage, handleMessageUpdated)
+  const handleMoodCheckin = useCallback((checkin: MoodCheckin) => {
+    if (checkin.user_id === userId) {
+      setMyMood(checkin)
+    } else {
+      setPartnerMood(checkin)
+    }
+  }, [userId])
+
+  const handleMoodSubmitted = useCallback((checkin: MoodCheckin) => {
+    setMyMood(checkin)
+  }, [])
+
+  useRealtime(link.id, userId, handleNewRealtimeMessage, handleMessageUpdated, handleMoodCheckin)
 
   // --- Sent / Replay handlers ---
 
@@ -184,9 +203,18 @@ export function BlackholeScene({
           <p className="text-xs text-foreground/30">
             Linked with {partner.display_name || 'your partner'}
           </p>
-          <p className="text-xs text-foreground/20">
-            {totalMessages} message{totalMessages !== 1 ? 's' : ''} in the void
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-foreground/20">
+              {totalMessages} message{totalMessages !== 1 ? 's' : ''} in the void
+            </p>
+            <MoodOrb
+              linkId={link.id}
+              userId={userId}
+              myMood={myMood}
+              partnerMood={partnerMood}
+              onMoodSubmitted={handleMoodSubmitted}
+            />
+          </div>
         </div>
       </div>
 

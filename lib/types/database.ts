@@ -90,6 +90,32 @@ export interface Database {
           accepted_at?: string | null
         }
       }
+      mood_checkins: {
+        Row: {
+          id: string
+          link_id: string
+          user_id: string
+          emoji: string
+          note: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          link_id: string
+          user_id: string
+          emoji: string
+          note?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          link_id?: string
+          user_id?: string
+          emoji?: string
+          note?: string | null
+          created_at?: string
+        }
+      }
       messages: {
         Row: {
           id: string

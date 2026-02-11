@@ -2,19 +2,23 @@
 
 import { useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Message } from '@/lib/types'
+import type { Message, MoodCheckin } from '@/lib/types'
 
 export function useRealtime(
   linkId: string | null,
   userId: string,
   onNewMessage: (message: Message) => void,
-  onMessageUpdated?: (message: Message) => void
+  onMessageUpdated?: (message: Message) => void,
+  onMoodCheckin?: (checkin: MoodCheckin) => void
 ) {
   const callbackRef = useRef(onNewMessage)
   callbackRef.current = onNewMessage
 
   const updateCallbackRef = useRef(onMessageUpdated)
   updateCallbackRef.current = onMessageUpdated
+
+  const moodCallbackRef = useRef(onMoodCheckin)
+  moodCallbackRef.current = onMoodCheckin
 
   useEffect(() => {
     if (!linkId) return
@@ -63,6 +67,21 @@ export function useRealtime(
             // Sender sees status updates on their sent messages
             if (updated.sender_id === userId && updateCallbackRef.current) {
               updateCallbackRef.current(updated)
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'mood_checkins',
+            filter: `link_id=eq.${linkId}`,
+          },
+          (payload) => {
+            const checkin = payload.new as MoodCheckin
+            if (moodCallbackRef.current) {
+              moodCallbackRef.current(checkin)
             }
           }
         )

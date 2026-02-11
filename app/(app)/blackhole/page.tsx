@@ -51,6 +51,26 @@ export default async function BlackholePage() {
     m => m.status === 'sent' && m.receiver_id === user.id
   )
 
+  // Fetch latest mood check-ins for each partner
+  const { data: moodData } = await supabase
+    .from('mood_checkins')
+    .select('*')
+    .eq('link_id', link.id)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  const moods = moodData ?? []
+  const latestMoods = new Map<string, (typeof moods)[0]>()
+  for (const checkin of moods) {
+    if (!latestMoods.has(checkin.user_id)) {
+      latestMoods.set(checkin.user_id, checkin)
+    }
+    if (latestMoods.size >= 2) break
+  }
+
+  const myMood = latestMoods.get(user.id) ?? null
+  const partnerMood = latestMoods.get(partnerId) ?? null
+
   return (
     <BlackholeScene
       userId={user.id}
@@ -58,6 +78,8 @@ export default async function BlackholePage() {
       link={link}
       initialMessages={history}
       pendingDeliveryMessages={pendingDelivery}
+      initialMyMood={myMood}
+      initialPartnerMood={partnerMood}
     />
   )
 }

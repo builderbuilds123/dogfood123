@@ -82,9 +82,22 @@ CREATE INDEX idx_messages_link_id ON public.messages(link_id, created_at DESC);
 CREATE INDEX idx_messages_receiver_status ON public.messages(receiver_id, status);
 CREATE INDEX idx_messages_sender ON public.messages(sender_id);
 
--- Enable Realtime for messages and user_links
+-- MOOD CHECKINS TABLE
+CREATE TABLE public.mood_checkins (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  link_id UUID NOT NULL REFERENCES public.user_links(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  emoji TEXT NOT NULL,
+  note TEXT CHECK (char_length(note) <= 100),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_mood_checkins_link_created ON public.mood_checkins(link_id, created_at DESC);
+
+-- Enable Realtime for messages, user_links, and mood_checkins
 ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.user_links;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.mood_checkins;
 
 -- ============================================
 -- ROW LEVEL SECURITY
@@ -159,6 +172,28 @@ CREATE POLICY "Receiver can mark messages as read"
   ON public.messages FOR UPDATE
   USING (auth.uid() = receiver_id)
   WITH CHECK (auth.uid() = receiver_id);
+
+-- MOOD_CHECKINS RLS
+ALTER TABLE public.mood_checkins ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can insert own mood checkins"
+  ON public.mood_checkins FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND link_id IN (
+      SELECT id FROM public.user_links
+      WHERE user_a = auth.uid() OR user_b = auth.uid()
+    )
+  );
+
+CREATE POLICY "Users can view mood checkins for their link"
+  ON public.mood_checkins FOR SELECT
+  USING (
+    link_id IN (
+      SELECT id FROM public.user_links
+      WHERE user_a = auth.uid() OR user_b = auth.uid()
+    )
+  );
 
 -- ============================================
 -- STORAGE BUCKETS (run in SQL editor or create via dashboard)
