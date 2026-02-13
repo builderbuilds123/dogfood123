@@ -34,12 +34,63 @@ export default async function BlackholePage() {
 
   if (!partner) redirect('/waiting')
 
-  // Fetch all messages for this link
-  const { data: allMessages } = await supabase
-    .from('messages')
-    .select('*')
-    .eq('link_id', link.id)
-    .order('created_at', { ascending: true })
+  // Fetch all data in parallel (async-parallel: eliminates sequential waterfall)
+  const today = new Date().toISOString().split('T')[0]
+
+  const [
+    { data: allMessages },
+    { data: moodData },
+    { data: wishlistData },
+    { count: unseenPingCount },
+    { data: latestSong },
+    { data: nextEvent },
+    { data: latestRecap },
+  ] = await Promise.all([
+    supabase
+      .from('messages')
+      .select('*')
+      .eq('link_id', link.id)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('mood_checkins')
+      .select('*')
+      .eq('link_id', link.id)
+      .order('created_at', { ascending: false })
+      .limit(20),
+    supabase
+      .from('wishlist_items')
+      .select('*')
+      .eq('link_id', link.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('pings')
+      .select('*', { count: 'exact', head: true })
+      .eq('link_id', link.id)
+      .neq('sender_id', user.id)
+      .is('seen_at', null),
+    supabase
+      .from('shared_songs')
+      .select('*')
+      .eq('link_id', link.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('calendar_events')
+      .select('*')
+      .eq('link_id', link.id)
+      .gte('event_date', today)
+      .order('event_date', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('weekly_recaps')
+      .select('*')
+      .eq('link_id', link.id)
+      .order('week_start', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ])
 
   const all = allMessages || []
 
@@ -51,14 +102,7 @@ export default async function BlackholePage() {
     m => m.status === 'sent' && m.receiver_id === user.id
   )
 
-  // Fetch latest mood check-ins for each partner
-  const { data: moodData } = await supabase
-    .from('mood_checkins')
-    .select('*')
-    .eq('link_id', link.id)
-    .order('created_at', { ascending: false })
-    .limit(20)
-
+  // Derive partner mood from fetched data
   const moods = moodData ?? []
   const latestMoods = new Map<string, (typeof moods)[0]>()
   for (const checkin of moods) {
@@ -67,8 +111,15 @@ export default async function BlackholePage() {
     }
     if (latestMoods.size >= 2) break
   }
-
   const partnerMood = latestMoods.get(partnerId) ?? null
+
+  // Extract image messages for photo gallery (newest first)
+  const photos = all
+    .filter(m => m.message_type === 'image')
+    .reverse()
+
+  // Show recap notification on Sundays
+  const isSunday = new Date().getDay() === 0
 
   return (
     <BlackholeScene
@@ -78,6 +129,13 @@ export default async function BlackholePage() {
       initialMessages={history}
       pendingDeliveryMessages={pendingDelivery}
       initialPartnerMood={partnerMood}
+      initialWishlistItems={wishlistData || []}
+      initialPhotos={photos}
+      initialUnseenPingCount={unseenPingCount || 0}
+      initialLatestSong={latestSong || null}
+      initialNextEvent={nextEvent || null}
+      initialRecap={latestRecap || null}
+      showRecapNotification={isSunday && !!latestRecap}
     />
   )
 }

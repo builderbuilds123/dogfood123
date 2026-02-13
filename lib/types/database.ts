@@ -116,6 +116,206 @@ export interface Database {
           created_at?: string
         }
       }
+      wishlist_items: {
+        Row: {
+          id: string
+          link_id: string
+          user_id: string
+          title: string
+          category: 'dates' | 'travel' | 'food' | 'gifts' | 'goals' | 'other'
+          completed: boolean
+          completed_by: string | null
+          created_at: string
+          completed_at: string | null
+        }
+        Insert: {
+          id?: string
+          link_id: string
+          user_id: string
+          title: string
+          category?: 'dates' | 'travel' | 'food' | 'gifts' | 'goals' | 'other'
+          completed?: boolean
+          completed_by?: string | null
+          created_at?: string
+          completed_at?: string | null
+        }
+        Update: {
+          id?: string
+          link_id?: string
+          user_id?: string
+          title?: string
+          category?: 'dates' | 'travel' | 'food' | 'gifts' | 'goals' | 'other'
+          completed?: boolean
+          completed_by?: string | null
+          created_at?: string
+          completed_at?: string | null
+        }
+      }
+      pings: {
+        Row: {
+          id: string
+          link_id: string
+          sender_id: string
+          created_at: string
+          seen_at: string | null
+        }
+        Insert: {
+          id?: string
+          link_id: string
+          sender_id: string
+          created_at?: string
+          seen_at?: string | null
+        }
+        Update: {
+          id?: string
+          link_id?: string
+          sender_id?: string
+          created_at?: string
+          seen_at?: string | null
+        }
+      }
+      daily_questions: {
+        Row: {
+          id: string
+          question_text: string
+          display_date: string
+        }
+        Insert: {
+          id?: string
+          question_text: string
+          display_date: string
+        }
+        Update: {
+          id?: string
+          question_text?: string
+          display_date?: string
+        }
+      }
+      question_answers: {
+        Row: {
+          id: string
+          question_id: string
+          link_id: string
+          user_id: string
+          answer_text: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          question_id: string
+          link_id: string
+          user_id: string
+          answer_text: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          question_id?: string
+          link_id?: string
+          user_id?: string
+          answer_text?: string
+          created_at?: string
+        }
+      }
+      shared_songs: {
+        Row: {
+          id: string
+          link_id: string
+          user_id: string
+          track_name: string
+          artist_name: string
+          artwork_url: string | null
+          track_view_url: string | null
+          preview_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          link_id: string
+          user_id: string
+          track_name: string
+          artist_name: string
+          artwork_url?: string | null
+          track_view_url?: string | null
+          preview_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          link_id?: string
+          user_id?: string
+          track_name?: string
+          artist_name?: string
+          artwork_url?: string | null
+          track_view_url?: string | null
+          preview_url?: string | null
+          created_at?: string
+        }
+      }
+      calendar_events: {
+        Row: {
+          id: string
+          link_id: string
+          user_id: string
+          title: string
+          description: string | null
+          event_date: string
+          event_type: 'milestone' | 'date'
+          emoji: string
+          recurring_yearly: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          link_id: string
+          user_id: string
+          title: string
+          description?: string | null
+          event_date: string
+          event_type: 'milestone' | 'date'
+          emoji?: string
+          recurring_yearly?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          link_id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          event_date?: string
+          event_type?: 'milestone' | 'date'
+          emoji?: string
+          recurring_yearly?: boolean
+          created_at?: string
+        }
+      }
+      weekly_recaps: {
+        Row: {
+          id: string
+          link_id: string
+          week_start: string
+          week_end: string
+          stats: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          link_id: string
+          week_start: string
+          week_end: string
+          stats?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          link_id?: string
+          week_start?: string
+          week_end?: string
+          stats?: Json
+          created_at?: string
+        }
+      }
       messages: {
         Row: {
           id: string
@@ -162,7 +362,14 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_streak: {
+        Args: { p_link_id: string }
+        Returns: number
+      }
+      generate_weekly_recap: {
+        Args: { p_link_id: string; p_week_start?: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
