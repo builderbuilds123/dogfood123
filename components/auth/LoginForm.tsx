@@ -18,16 +18,36 @@ export function LoginForm() {
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      toast(error.message, 'error')
+      // Provide friendlier messages for common errors
+      if (error.message === 'Invalid login credentials') {
+        toast('Invalid email or password. Please try again.', 'error')
+      } else if (error.message === 'Email not confirmed') {
+        toast('Please check your email and confirm your account first.', 'error')
+      } else {
+        toast(error.message, 'error')
+      }
       setLoading(false)
       return
     }
 
-    router.push('/blackhole')
-    router.refresh()
+    // Check if user has a persona set
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('persona')
+        .eq('id', data.user.id)
+        .single()
+
+      if (!profile?.persona) {
+        router.push('/select-persona')
+      } else {
+        router.push('/blackhole')
+      }
+      router.refresh()
+    }
   }
 
   return (
