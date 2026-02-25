@@ -74,11 +74,14 @@ export function SignupForm() {
 
     setLoading(true)
 
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { display_name: displayName || email.split('@')[0], persona },
+        emailRedirectTo: `${appUrl}/auth/callback`,
       },
     })
 
@@ -88,8 +91,24 @@ export function SignupForm() {
       return
     }
 
-    // Update profile with persona
-    if (data.user) {
+    // Check if email confirmation is required (no session means confirmation pending)
+    if (data.user && !data.session) {
+      // User created but email confirmation required
+      // Check if this is a "fake" signup (user already exists - identities will be empty)
+      if (data.user.identities && data.user.identities.length === 0) {
+        toast('An account with this email already exists. Please sign in instead.', 'error')
+        setLoading(false)
+        return
+      }
+
+      toast('Check your email for a confirmation link to complete signup!', 'success')
+      setLoading(false)
+      return
+    }
+
+    // Session exists - email confirmation is disabled or auto-confirmed
+    if (data.user && data.session) {
+      // Update profile with persona (session is active so RLS will work)
       await supabase
         .from('profiles')
         .update({ persona, display_name: displayName || email.split('@')[0] })
@@ -110,10 +129,10 @@ export function SignupForm() {
           toast('Referral linking failed: ' + rpcResult.error, 'error')
         }
       }
-    }
 
-    router.push('/blackhole')
-    router.refresh()
+      router.push('/blackhole')
+      router.refresh()
+    }
   }
 
   return (

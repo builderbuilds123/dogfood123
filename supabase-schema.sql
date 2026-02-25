@@ -15,15 +15,20 @@ CREATE TABLE public.profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Auto-create profile on signup
+-- Auto-create profile on signup (includes persona from user metadata if provided)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, display_name)
+  INSERT INTO public.profiles (id, email, display_name, persona)
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1))
+    COALESCE(NEW.raw_user_meta_data->>'display_name', split_part(NEW.email, '@', 1)),
+    CASE
+      WHEN NEW.raw_user_meta_data->>'persona' IN ('doggo', 'princess')
+      THEN NEW.raw_user_meta_data->>'persona'
+      ELSE NULL
+    END
   );
   RETURN NEW;
 END;
