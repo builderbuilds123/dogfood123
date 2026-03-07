@@ -1,0 +1,59 @@
+# Progress Log
+Run: 14f3b635-8c12-443b-b97a-5c0553b6babf
+Task: Fix the display issue on mobile
+Started: 2026-03-07 00:20 UTC
+
+## Codebase Patterns
+- Next.js 16.1.6 with Turbopack, Tailwind CSS v4
+- CSS is in `app/globals.css` using `@theme inline` for custom properties
+- Tests use vitest, run with `pnpm test`
+- Build command: `pnpm build`
+- Test files are in `tests/` directory with `.test.ts` extension
+- Dynamic viewport height uses `min-h-[100dvh]` for mobile browser compatibility
+- Safe-area-inset utilities use inline `pt-[env(safe-area-inset-top)]` syntax directly in className
+
+---
+
+## 2026-03-07 00:21 UTC - US-001: Add mobile-safe viewport utilities to globals.css
+- Added CSS custom properties for safe-area-inset-top/bottom/left/right with env() fallbacks
+- Added .mobile-safe-top utility class with padding-top using safe-area-inset
+- Added .mobile-safe-bottom utility class with padding-bottom using safe-area-inset
+- Added .h-dvh-full utility class with height: 100dvh for mobile browsers
+- Created tests/css-utilities.test.ts with 7 tests validating CSS utilities
+- Build passes (pnpm build)
+- All 110 tests pass (pnpm test)
+- Committed: feat: US-001 - Add mobile-safe viewport utilities to globals.css
+
+**Files changed:**
+- app/globals.css (+44 lines)
+- tests/css-utilities.test.ts (new file, +48 lines)
+
+**Learnings:**
+- Tailwind CSS v4 uses `@theme inline` syntax for custom properties in globals.css
+- CSS utilities can be added directly to globals.css alongside the @theme block
+- vitest tests can read and validate CSS file contents using readFileSync
+
+---
+
+## 2026-03-07 01:02 UTC - US-002: Fix BlackholeScene to use dynamic viewport height
+- Replaced h-screen with min-h-[100dvh] in BlackholeScene.tsx main container
+- Added pt-[env(safe-area-inset-top)] to status bar for notch/home indicator padding
+- Added pb-[env(safe-area-inset-bottom)] to bottom bar for home indicator padding
+- Verified blackhole remains vertically centered with flex items-center justify-center
+- Created tests/blackhole-viewport.test.ts with 5 tests for viewport height handling
+- Build passes (pnpm build)
+- All 115 tests pass (pnpm test)
+- Committed: feat: US-002 - Fix BlackholeScene to use dynamic viewport height
+
+**Files changed:**
+- components/blackhole/BlackholeScene.tsx (modified, -3 lines)
+- tests/blackhole-viewport.test.ts (new file, +45 lines)
+- .gitignore (+3 lines for *.key security)
+
+**Learnings:**
+- Use min-h-[100dvh] instead of h-screen for mobile browser compatibility (avoids cutoff by URL bar)
+- Safe-area-inset can be applied inline with Tailwind's arbitrary value syntax: pt-[env(safe-area-inset-top)]
+- The flex-1 flex items-center justify-center pattern maintains vertical centering with dynamic height
+
+---
+
