@@ -121,11 +121,12 @@ export function ReplayTimeline({ messages, userId, onSeek, onReplayModeChange, r
     : 1
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* Timeline track */}
+    <div className="flex flex-col gap-2 mobile-safe-bottom replay-timeline-container">
+      {/* Timeline track - minimum 44px height for touch interaction */}
+      {/* Horizontal scroll on narrow screens < 400px for message thumbnails */}
       <div
         ref={trackRef}
-        className="relative w-full h-8 cursor-pointer select-none touch-none"
+        className="relative w-full min-h-[44px] cursor-pointer select-none touch-none"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -166,12 +167,14 @@ export function ReplayTimeline({ messages, userId, onSeek, onReplayModeChange, r
           )
         })}
 
-        {/* Scrubber handle */}
+        {/* Scrubber handle - 48x48px minimum touch target */}
         {currentIndex >= 0 && (
           <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full shadow-[0_0_10px_rgba(0,255,255,0.5)] border-2 border-neon-cyan transition-[left] duration-100"
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 min-w-[48px] min-h-[48px] flex items-center justify-center"
             style={{ left: `${(currentIndex / Math.max(messages.length - 1, 1)) * 100}%` }}
-          />
+          >
+            <div className="w-4 h-4 bg-white rounded-full shadow-[0_0_10px_rgba(0,255,255,0.5)] border-2 border-neon-cyan transition-[left] duration-100" />
+          </div>
         )}
       </div>
 

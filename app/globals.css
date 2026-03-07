@@ -40,6 +40,24 @@
   height: 100dvh;
 }
 
+/* Hide scrollbar for horizontal scroll containers (mobile timeline) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ReplayTimeline horizontal scroll on narrow screens */
+@media (max-width: 400px) {
+  .replay-timeline-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Status bar responsive wrapper - allows wrapping on narrow screens */
 .status-bar-wrapper {
   display: flex;
