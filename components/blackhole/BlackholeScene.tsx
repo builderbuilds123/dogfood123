@@ -235,9 +235,9 @@ export function BlackholeScene({
   const enteringSentMessages = animatingMessages.filter(a => a.phase === 'entering' && a.direction === 'in')
 
   return (
-    <div className="relative h-screen w-full flex flex-col overflow-hidden">
+    <div className="relative min-h-[100dvh] w-full flex flex-col overflow-hidden">
       {/* Status bar */}
-      <div className="w-full max-w-lg mx-auto px-4 pt-3 pb-1 shrink-0">
+      <div className="w-full max-w-lg mx-auto px-4 pt-[env(safe-area-inset-top)] pt-3 pb-1 shrink-0">
         <div className="flex items-center justify-between">
           <p className="text-xs text-foreground/30">
             Linked with {partner.display_name || 'your partner'}
@@ -329,7 +329,7 @@ export function BlackholeScene({
       </div>
 
       {/* Bottom bar — fixed height, never shifts */}
-      <div className="w-full max-w-lg mx-auto px-4 pb-4 pt-2 shrink-0">
+      <div className="w-full max-w-lg mx-auto px-4 pb-[env(safe-area-inset-bottom)] pb-4 pt-2 shrink-0">
         {!replayMode && (
           <ChatInterface
             linkId={link.id}
