@@ -12,6 +12,9 @@ Started: 2026-03-07 00:20 UTC
 - Mobile safe-area-inset CSS custom properties defined in :root with env() fallbacks
 - Tailwind arbitrary values with env() work: `ml-[env(safe-area-inset-left)]`
 - Fixed-position buttons use z-30, drawers use z-40/z-50 for proper layering
+- Drawer panels use `max-h-[calc(100dvh-120px)]` for dynamic viewport height accounting for browser chrome
+- Drawer content areas use `pb-[env(safe-area-inset-bottom)]` for home indicator clearance
+- Drawer structure: handle bar (shrink-0) → header (shrink-0) → scrollable content (flex-1 overflow-y-auto min-h-0)
 
 ---
 
@@ -57,6 +60,33 @@ Started: 2026-03-07 00:20 UTC
 - top-14 = 56px, top-4 = 16px, button height (w-9 h-9) = 36px, so no overlap on any screen
 - Drawer components (QuestionDrawer, WishlistDrawer, etc.) use z-40 for backdrop and z-50 for panel
 - Button positioning tests can validate both CSS classes and mathematical spacing relationships
+
+---
+
+## 2026-03-07 01:33 UTC - US-005: Update drawer components for mobile browser chrome
+- Updated all 5 drawer components to use `max-h-[calc(100dvh-120px)]` instead of `max-h-[80vh]`
+- Added `pb-[env(safe-area-inset-bottom)]` to all drawer content areas for home indicator clearance
+- Drawer components updated: QuestionDrawer, RecapDrawer, CalendarDrawer, PhotoDrawer, WishlistDrawer
+- Handle bar remains visible at top of each drawer panel (shrink-0 ensures it doesn't collapse)
+- Created tests/drawer-mobile-layout.test.ts with 50 tests validating drawer mobile layout
+- Build passes (pnpm build)
+- All 191 tests pass (pnpm test)
+- Committed: feat: US-005 - Update drawer components for mobile browser chrome
+
+**Files changed:**
+- components/questions/QuestionDrawer.tsx (+1 line, -1 line)
+- components/recap/RecapDrawer.tsx (+1 line, -1 line)
+- components/calendar/CalendarDrawer.tsx (+1 line, -1 line)
+- components/photos/PhotoDrawer.tsx (+1 line, -1 line)
+- components/wishlist/WishlistDrawer.tsx (+1 line, -1 line)
+- tests/drawer-mobile-layout.test.ts (new file, +95 lines)
+
+**Learnings:**
+- `calc(100dvh-120px)` accounts for mobile browser address bars (typically 100-120px on iOS Safari)
+- `100dvh` is the dynamic viewport height that changes as browser UI shows/hides
+- Drawer content needs both flex-1 and min-h-0 for proper scrolling within constrained height
+- `pb-[env(safe-area-inset-bottom)]` adds padding for iPhone home indicator area
+- Drawer structure pattern: fixed panel with flex-col, shrink-0 header/handle, flex-1 scrollable content
 
 ---
 
