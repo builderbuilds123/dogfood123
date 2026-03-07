@@ -15,6 +15,80 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ========== MOBILE-SAFE VIEWPORT UTILITIES ========== */
+
+/* Safe area inset CSS custom properties with fallbacks */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+/* Mobile-safe top padding utility - handles notches and address bars */
+.mobile-safe-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+/* Mobile-safe bottom padding utility - handles home indicators */
+.mobile-safe-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* Dynamic viewport height container - handles mobile browser chrome */
+.h-dvh-full {
+  height: 100dvh;
+}
+
+/* Hide scrollbar for horizontal scroll containers (mobile timeline) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ReplayTimeline horizontal scroll on narrow screens */
+@media (max-width: 400px) {
+  .replay-timeline-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Status bar responsive wrapper - allows wrapping on narrow screens */
+.status-bar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+@media (max-width: 400px) {
+  .status-bar-wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+}
+
+/* Status bar elements container - stacks on very narrow screens */
+.status-bar-elements {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 380px) {
+  .status-bar-elements {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
@@ -246,4 +320,53 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 0, 255, 0.5);
+}
+
+/* ========== CHAT INTERFACE RESPONSIVE ========== */
+
+/* Chat form container with horizontal safe-area-inset padding */
+.chat-form-container {
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+}
+
+/* Prevent horizontal scroll on narrow screens */
+@media (max-width: 320px) {
+  .chat-form-container {
+    overflow-x: hidden;
+  }
+}
+
+/* Stack image/audio buttons above input on very narrow screens */
+@media (max-width: 340px) {
+  .chat-input-row {
+    flex-wrap: wrap;
+  }
+
+  .chat-input-row .chat-buttons-left {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .chat-input-row .chat-input-wrapper {
+    width: 100%;
+  }
+}
+
+/* Reduce button sizes on screens < 380px */
+@media (max-width: 379px) {
+  .chat-button-attach,
+  .chat-button-audio {
+    width: 2.25rem !important; /* w-9 */
+    height: 2.25rem !important; /* h-9 */
+  }
+
+  .chat-button-attach svg,
+  .chat-button-audio svg {
+    width: 1.125rem; /* w-4.5 */
+    height: 1.125rem; /* h-4.5 */
+  }
 }
