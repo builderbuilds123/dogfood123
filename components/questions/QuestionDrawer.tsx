@@ -221,7 +221,7 @@ export function QuestionDrawer({ linkId, userId, partnerName }: QuestionDrawerPr
 
             {/* Drawer panel */}
             <motion.div
-              className="fixed z-50 bottom-0 left-0 right-0 max-h-[80vh] flex flex-col bg-surface border-t border-border/50 rounded-t-3xl overflow-hidden"
+              className="fixed z-50 bottom-0 left-0 right-0 max-h-[calc(100dvh-120px)] flex flex-col bg-surface border-t border-border/50 rounded-t-3xl overflow-hidden"
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
@@ -252,7 +252,7 @@ export function QuestionDrawer({ linkId, userId, partnerName }: QuestionDrawerPr
               </div>
 
               {/* Content */}
-              <div className="flex-1 overflow-y-auto min-h-0 px-5 pb-5 space-y-5">
+              <div className="flex-1 overflow-y-auto min-h-0 px-5 pb-5 pb-[env(safe-area-inset-bottom)] space-y-5">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <div className="text-xs text-foreground/25">Loading...</div>

@@ -9,10 +9,9 @@ Started: 2026-03-07 00:20 UTC
 - Tests use vitest, run with `pnpm test`
 - Build command: `pnpm build`
 - Test files are in `tests/` directory with `.test.ts` extension
-- Dynamic viewport height uses `min-h-[100dvh]` for mobile browser compatibility
-- Safe-area-inset utilities use inline `pt-[env(safe-area-inset-top)]` syntax directly in className
-- Responsive breakpoints use standard CSS @media queries in globals.css (not Tailwind arbitrary values)
-- Status bar responsive layout uses CSS classes (.status-bar-wrapper, .status-bar-elements) with @media queries for flex-wrap behavior
+- Mobile safe-area-inset CSS custom properties defined in :root with env() fallbacks
+- Tailwind arbitrary values with env() work: `ml-[env(safe-area-inset-left)]`
+- Fixed-position buttons use z-30, drawers use z-40/z-50 for proper layering
 
 ---
 
@@ -37,49 +36,27 @@ Started: 2026-03-07 00:20 UTC
 
 ---
 
-## 2026-03-07 01:02 UTC - US-002: Fix BlackholeScene to use dynamic viewport height
-- Replaced h-screen with min-h-[100dvh] in BlackholeScene.tsx main container
-- Added pt-[env(safe-area-inset-top)] to status bar for notch/home indicator padding
-- Added pb-[env(safe-area-inset-bottom)] to bottom bar for home indicator padding
-- Verified blackhole remains vertically centered with flex items-center justify-center
-- Created tests/blackhole-viewport.test.ts with 5 tests for viewport height handling
+## 2026-03-07 01:23 UTC - US-004: Fix fixed-position button collisions on mobile
+- PingButton: added ml-[env(safe-area-inset-left)] for mobile safe area, kept top-4 left-4 positioning
+- QuestionDrawer trigger: moved from top-16 to top-14 (56px) to avoid PingButton overlap, added ml-[env(safe-area-inset-left)]
+- Settings button: added mr-[env(safe-area-inset-right)] for mobile safe area, kept top-4 right-4 positioning
+- Z-index hierarchy maintained: Ping=30, Question=30, Settings=30, Drawers=40+
+- Created tests/button-positioning.test.ts with 15 tests validating button positioning
 - Build passes (pnpm build)
-- All 115 tests pass (pnpm test)
-- Committed: feat: US-002 - Fix BlackholeScene to use dynamic viewport height
+- All 141 tests pass (pnpm test)
+- Committed: feat: US-004 - Fix fixed-position button collisions on mobile
 
 **Files changed:**
-- components/blackhole/BlackholeScene.tsx (modified, -3 lines)
-- tests/blackhole-viewport.test.ts (new file, +45 lines)
-- .gitignore (+3 lines for *.key security)
+- components/ping/PingButton.tsx (+1 line)
+- components/questions/QuestionDrawer.tsx (+1 line, -1 line)
+- components/blackhole/BlackholeScene.tsx (+1 line)
+- tests/button-positioning.test.ts (new file, +89 lines)
 
 **Learnings:**
-- Use min-h-[100dvh] instead of h-screen for mobile browser compatibility (avoids cutoff by URL bar)
-- Safe-area-inset can be applied inline with Tailwind's arbitrary value syntax: pt-[env(safe-area-inset-top)]
-- The flex-1 flex items-center justify-center pattern maintains vertical centering with dynamic height
-
----
-
-## 2026-03-07 01:12 UTC - US-003: Add responsive spacing to BlackholeScene status bar
-- Added .status-bar-wrapper CSS class with flex layout and gap-2 spacing
-- Added @media (max-width: 400px) query for flex-wrap on narrow screens
-- Added .status-bar-elements CSS class for MusicPill, message count, and MoodOrb container
-- Added @media (max-width: 380px) query for stacking elements on iPhone SE width (375px)
-- Updated BlackholeScene.tsx status bar to use new responsive CSS classes
-- Added 11 tests to tests/css-utilities.test.ts for responsive status bar layout
-- Build passes (pnpm build)
-- All 126 tests pass (pnpm test)
-- Committed: feat: US-003 - Add responsive spacing to BlackholeScene status bar
-
-**Files changed:**
-- app/globals.css (+40 lines)
-- components/blackhole/BlackholeScene.tsx (modified, -2 lines)
-- tests/css-utilities.test.ts (modified, +58 lines)
-
-**Learnings:**
-- Responsive breakpoints use standard CSS @media queries in globals.css for complex flex-wrap behavior
-- Status bar elements wrap at 400px and stack at 380px (iPhone SE width)
-- text-xs class maintains readability on mobile screens
-- vitest tests can validate @media query presence using regex patterns on CSS file contents
+- Tailwind arbitrary values support env() functions: `ml-[env(safe-area-inset-left)]`
+- top-14 = 56px, top-4 = 16px, button height (w-9 h-9) = 36px, so no overlap on any screen
+- Drawer components (QuestionDrawer, WishlistDrawer, etc.) use z-40 for backdrop and z-50 for panel
+- Button positioning tests can validate both CSS classes and mathematical spacing relationships
 
 ---
 
