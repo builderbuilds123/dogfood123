@@ -15,6 +15,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ========== MOBILE-SAFE VIEWPORT UTILITIES ========== */
+
+/* Safe area inset CSS custom properties with fallbacks */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+/* Mobile-safe top padding utility - handles notches and address bars */
+.mobile-safe-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+/* Mobile-safe bottom padding utility - handles home indicators */
+.mobile-safe-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* Dynamic viewport height container - handles mobile browser chrome */
+.h-dvh-full {
+  height: 100dvh;
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);
