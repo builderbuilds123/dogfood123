@@ -42,3 +42,56 @@ describe('Mobile-Safe Viewport Utilities', () => {
     })
   })
 })
+
+describe('Status Bar Responsive Layout', () => {
+  const globalsCssPath = resolve(__dirname, '../app/globals.css')
+  const globalsCss = readFileSync(globalsCssPath, 'utf-8')
+
+  describe('.status-bar-wrapper utility class', () => {
+    it('should exist with flex display', () => {
+      expect(globalsCss).toMatch(/\.status-bar-wrapper\s*\{[^}]*display:\s*flex/)
+    })
+
+    it('should have align-items: center', () => {
+      expect(globalsCss).toMatch(/\.status-bar-wrapper\s*\{[^}]*align-items:\s*center/)
+    })
+
+    it('should have justify-content: space-between', () => {
+      expect(globalsCss).toMatch(/\.status-bar-wrapper\s*\{[^}]*justify-content:\s*space-between/)
+    })
+
+    it('should have gap: 0.5rem', () => {
+      expect(globalsCss).toMatch(/\.status-bar-wrapper\s*\{[^}]*gap:\s*0\.5rem/)
+    })
+
+    it('should use flex-wrap on screens < 400px', () => {
+      expect(globalsCss).toMatch(/@media\s*\(\s*max-width:\s*400px\s*\)\s*\{[^}]*\.status-bar-wrapper\s*\{[^}]*flex-wrap:\s*wrap/)
+    })
+
+    it('should center content on screens < 400px', () => {
+      expect(globalsCss).toMatch(/@media\s*\(\s*max-width:\s*400px\s*\)\s*\{[^}]*\.status-bar-wrapper\s*\{[^}]*justify-content:\s*center/)
+    })
+  })
+
+  describe('.status-bar-elements utility class', () => {
+    it('should exist with flex display', () => {
+      expect(globalsCss).toMatch(/\.status-bar-elements\s*\{[^}]*display:\s*flex/)
+    })
+
+    it('should have align-items: center', () => {
+      expect(globalsCss).toMatch(/\.status-bar-elements\s*\{[^}]*align-items:\s*center/)
+    })
+
+    it('should have gap: 0.5rem', () => {
+      expect(globalsCss).toMatch(/\.status-bar-elements\s*\{[^}]*gap:\s*0\.5rem/)
+    })
+
+    it('should use flex-wrap on screens < 380px', () => {
+      expect(globalsCss).toMatch(/@media\s*\(\s*max-width:\s*380px\s*\)\s*\{[^}]*\.status-bar-elements\s*\{[^}]*flex-wrap:\s*wrap/)
+    })
+
+    it('should center content on screens < 380px', () => {
+      expect(globalsCss).toMatch(/@media\s*\(\s*max-width:\s*380px\s*\)\s*\{[^}]*\.status-bar-elements\s*\{[^}]*justify-content:\s*center/)
+    })
+  })
+})

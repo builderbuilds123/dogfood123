@@ -40,6 +40,37 @@
   height: 100dvh;
 }
 
+/* Status bar responsive wrapper - allows wrapping on narrow screens */
+.status-bar-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+@media (max-width: 400px) {
+  .status-bar-wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+}
+
+/* Status bar elements container - stacks on very narrow screens */
+.status-bar-elements {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+@media (max-width: 380px) {
+  .status-bar-elements {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
 body {
   background: var(--color-background);
   color: var(--color-foreground);

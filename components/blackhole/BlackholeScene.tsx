@@ -238,11 +238,11 @@ export function BlackholeScene({
     <div className="relative min-h-[100dvh] w-full flex flex-col overflow-hidden">
       {/* Status bar */}
       <div className="w-full max-w-lg mx-auto px-4 pt-[env(safe-area-inset-top)] pt-3 pb-1 shrink-0">
-        <div className="flex items-center justify-between">
+        <div className="status-bar-wrapper">
           <p className="text-xs text-foreground/30">
             Linked with {partner.display_name || 'your partner'}
           </p>
-          <div className="flex items-center gap-2">
+          <div className="status-bar-elements">
             <MusicPill
               linkId={link.id}
               userId={userId}
