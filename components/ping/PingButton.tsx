@@ -141,7 +141,7 @@ export function PingButton({ linkId, userId, initialUnseenCount = 0 }: PingButto
         type="button"
         onClick={handleSend}
         disabled={cooldown}
-        className={`fixed top-4 left-4 z-30 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md border transition-all ${
+        className={`fixed top-4 left-4 z-30 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md border transition-all ml-[env(safe-area-inset-left)] ${
           cooldown
             ? 'bg-surface-light/20 border-border/15 text-foreground/15'
             : 'bg-surface-light/40 border-border/30 hover:border-pink-400/40 text-pink-400/70 hover:text-pink-400'

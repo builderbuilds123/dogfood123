@@ -194,7 +194,7 @@ export function QuestionDrawer({ linkId, userId, partnerName }: QuestionDrawerPr
       <motion.button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed top-16 left-4 z-30 w-9 h-9 rounded-full flex items-center justify-center bg-surface-light/40 backdrop-blur-md border border-border/30 hover:border-amber-400/40 transition-colors"
+        className="fixed top-14 left-4 z-30 w-9 h-9 rounded-full flex items-center justify-center bg-surface-light/40 backdrop-blur-md border border-border/30 hover:border-amber-400/40 transition-colors ml-[env(safe-area-inset-left)]"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         title="Question of the Day"

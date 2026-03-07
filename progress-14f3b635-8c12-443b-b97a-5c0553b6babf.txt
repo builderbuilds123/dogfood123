@@ -11,6 +11,8 @@ Started: 2026-03-07 00:20 UTC
 - Test files are in `tests/` directory with `.test.ts` extension
 - Dynamic viewport height uses `min-h-[100dvh]` for mobile browser compatibility
 - Safe-area-inset utilities use inline `pt-[env(safe-area-inset-top)]` syntax directly in className
+- Responsive breakpoints use standard CSS @media queries in globals.css (not Tailwind arbitrary values)
+- Status bar responsive layout uses CSS classes (.status-bar-wrapper, .status-bar-elements) with @media queries for flex-wrap behavior
 
 ---
 
@@ -54,6 +56,30 @@ Started: 2026-03-07 00:20 UTC
 - Use min-h-[100dvh] instead of h-screen for mobile browser compatibility (avoids cutoff by URL bar)
 - Safe-area-inset can be applied inline with Tailwind's arbitrary value syntax: pt-[env(safe-area-inset-top)]
 - The flex-1 flex items-center justify-center pattern maintains vertical centering with dynamic height
+
+---
+
+## 2026-03-07 01:12 UTC - US-003: Add responsive spacing to BlackholeScene status bar
+- Added .status-bar-wrapper CSS class with flex layout and gap-2 spacing
+- Added @media (max-width: 400px) query for flex-wrap on narrow screens
+- Added .status-bar-elements CSS class for MusicPill, message count, and MoodOrb container
+- Added @media (max-width: 380px) query for stacking elements on iPhone SE width (375px)
+- Updated BlackholeScene.tsx status bar to use new responsive CSS classes
+- Added 11 tests to tests/css-utilities.test.ts for responsive status bar layout
+- Build passes (pnpm build)
+- All 126 tests pass (pnpm test)
+- Committed: feat: US-003 - Add responsive spacing to BlackholeScene status bar
+
+**Files changed:**
+- app/globals.css (+40 lines)
+- components/blackhole/BlackholeScene.tsx (modified, -2 lines)
+- tests/css-utilities.test.ts (modified, +58 lines)
+
+**Learnings:**
+- Responsive breakpoints use standard CSS @media queries in globals.css for complex flex-wrap behavior
+- Status bar elements wrap at 400px and stack at 380px (iPhone SE width)
+- text-xs class maintains readability on mobile screens
+- vitest tests can validate @media query presence using regex patterns on CSS file contents
 
 ---
 
