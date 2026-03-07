@@ -15,6 +15,8 @@ Started: 2026-03-07 00:20 UTC
 - Drawer panels use `max-h-[calc(100dvh-120px)]` for dynamic viewport height accounting for browser chrome
 - Drawer content areas use `pb-[env(safe-area-inset-bottom)]` for home indicator clearance
 - Drawer structure: handle bar (shrink-0) → header (shrink-0) → scrollable content (flex-1 overflow-y-auto min-h-0)
+- ChatInterface responsive CSS uses media queries at 320px, 340px, and 379px breakpoints for progressive enhancement
+- Touch targets should maintain min-w-[44px] min-h-[44px] for accessibility even when visual sizes shrink
 
 ---
 
@@ -42,7 +44,7 @@ Started: 2026-03-07 00:20 UTC
 ## 2026-03-07 01:23 UTC - US-004: Fix fixed-position button collisions on mobile
 - PingButton: added ml-[env(safe-area-inset-left)] for mobile safe area, kept top-4 left-4 positioning
 - QuestionDrawer trigger: moved from top-16 to top-14 (56px) to avoid PingButton overlap, added ml-[env(safe-area-inset-left)]
-- Settings button: added mr-[env(safe-area-inset-right)] for mobile safe area, kept top-4 right-4 positioning
+- Settings button: added mr-[env(safe-area-inset-left)] for mobile safe area, kept top-4 right-4 positioning
 - Z-index hierarchy maintained: Ping=30, Question=30, Settings=30, Drawers=40+
 - Created tests/button-positioning.test.ts with 15 tests validating button positioning
 - Build passes (pnpm build)
@@ -58,7 +60,7 @@ Started: 2026-03-07 00:20 UTC
 **Learnings:**
 - Tailwind arbitrary values support env() functions: `ml-[env(safe-area-inset-left)]`
 - top-14 = 56px, top-4 = 16px, button height (w-9 h-9) = 36px, so no overlap on any screen
-- Drawer components (QuestionDrawer, WishlistDrawer, etc.) use z-40 for backdrop and z-50 for panel
+- Drawer components (QuestionDrawer, RecapDrawer, etc.) use z-40 for backdrop and z-50 for panel
 - Button positioning tests can validate both CSS classes and mathematical spacing relationships
 
 ---
@@ -87,6 +89,32 @@ Started: 2026-03-07 00:20 UTC
 - Drawer content needs both flex-1 and min-h-0 for proper scrolling within constrained height
 - `pb-[env(safe-area-inset-bottom)]` adds padding for iPhone home indicator area
 - Drawer structure pattern: fixed panel with flex-col, shrink-0 header/handle, flex-1 scrollable content
+
+---
+
+## 2026-03-07 02:18 UTC - US-006: Make ChatInterface responsive for narrow screens
+- Added .chat-form-container with safe-area-inset-left/right padding to MessageInput form wrapper
+- Added overflow-x: hidden at 320px to prevent horizontal scroll on narrowest screens
+- Reduced attach image and audio buttons from w-10 h-10 to w-9 h-9 (2.25rem) on screens < 380px
+- Added min-w-[44px] min-h-[44px] to all buttons for 44x44px minimum touch target (accessibility)
+- Updated textarea minHeight from 42px to 44px for comfortable mobile typing
+- Added stacking layout at 340px: buttons stack above input row on very narrow screens
+- Created tests/chat-interface-responsive.test.ts with 15 tests validating responsive layout
+- Build passes (pnpm build)
+- All 206 tests pass (pnpm test)
+- Committed: feat: US-006 - Make ChatInterface responsive for narrow screens
+
+**Files changed:**
+- app/globals.css (+52 lines)
+- components/chat/MessageInput.tsx (+12 lines, -10 lines)
+- tests/chat-interface-responsive.test.ts (new file, +105 lines)
+
+**Learnings:**
+- CSS media queries can target specific breakpoints: 320px (no scroll), 340px (stack buttons), 379px (shrink buttons)
+- Touch targets should maintain 44x44px minimum even when visual sizes are reduced for compact layouts
+- Using `!important` in CSS media queries ensures responsive overrides take precedence over inline Tailwind classes
+- Nested CSS selectors like `.chat-input-row .chat-buttons-left` provide better scoping than global class overrides
+- vitest tests can validate both CSS content and component JSX structure using readFileSync
 
 ---
 
